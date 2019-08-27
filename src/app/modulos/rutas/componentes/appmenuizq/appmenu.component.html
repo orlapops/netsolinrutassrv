@@ -1,0 +1,145 @@
+<rutas-busqueda ptitulo="Monitor Busquedas" *ngIf="mostmonibusquedas" (evenclose)="closebusqueda()">
+</rutas-busqueda>
+<aside class="main-sidebar">
+    <section class="sidebar">
+        <ul class="sidebar-menu">
+            <li class="active">
+                <a href="#">
+                    <span>OPCIONES</span>
+                </a>
+            </li>
+            <li>
+                <!-- <a href='javascript:show_dialogo_con("../EjeConsultaLis.wss?VRCod_obj=MONIBUSQCRM&VCAMPO=&VCONDI=Especial&VRPLINKXML=N&VTEXTO=","Busqueda","700px","100%",true)'> -->
+                <a (click)="openbusqueda()">
+                    <i (click)="openbusqueda()" class="fa fa-search text-red busqueda" data-toggle="tooltip" title="Click para busquedas."></i>
+                    <span class="busqueda">Monitor Busquedas Rutas</span>
+                </a>
+            </li>
+
+
+        </ul>
+
+        <!-- sidebar menu: : style can be found in sidebar.less -->
+        <ul class="sidebar-menu" data-widget="tree">
+            <!-- <li class="treeview">
+                <a href="#">
+                    <i class="fa fa-table"></i> <span>Tables</span>
+                    <span class="pull-right-container">
+                            <i class="fa fa-angle-left pull-right"></i>
+                          </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="pages/tables/simple.html"><i class="fa fa-circle-o"></i> Cliente Potencial</a></li>
+                    <li><a href="pages/tables/data.html"><i class="fa fa-circle-o"></i>Cuentas</a></li>
+                </ul>
+            </li> -->
+
+            <li>
+                <a routerLink="/home" routerLinkActive="active">
+                    <i class="fa fa-home"></i>Inicio</a>
+            </li>
+
+            <li>
+                <a routerLink="/menutbas" routerLinkActive="active">
+                    <i class="fa fa-table"></i>Mant. Tablas</a>
+            </li>
+            <!-- <li>
+                <a routerLink="/mantbasica/CRMCLIENTECP01" routerLinkActive="active">
+                    <i class="fa fa-users"></i>Clientes potenciales</a>
+            </li>
+            <li>
+                <a routerLink="/mantbasica/CRMCLIENTECUE01" routerLinkActive="active">
+                    <i class="fa fa-user-plus"></i>Cuentas</a>
+            </li>
+            <li>
+                <a routerLink="/monitorgeneral" routerLinkActive="active">
+                    <i class="fa fa-area-chart"></i>Monitor General</a>
+            </li> -->
+            <li class="treeview">
+                <a href="#">
+                    <i class="fa fa-table"></i> <span>Procesos</span>
+                    <span class="pull-right-container">
+                  <i class="fa fa-angle-left pull-right"></i>
+                </span>
+                </a>
+                <ul class="treeview-menu">
+                    <li><a href="pages/tables/simple.html"><i class="fa fa-circle-o"></i> opcion 1 submenu</a></li>
+                    <li><a href="pages/tables/data.html"><i class="fa fa-circle-o"></i> opcion 2 submenu</a></li>
+                </ul>
+            </li>
+
+            <ul class="treeview-menu">
+                <li><a href="pages/tables/simple.html"><i class="fa fa-circle-o"></i> Simple tables</a></li>
+                <li><a href="pages/tables/data.html"><i class="fa fa-circle-o"></i> Data tables</a></li>
+            </ul>
+
+            <ul class="sidebar-menu" data-widget="tree">
+                <li class="active treeview menu-open">
+                    <a href="#">
+                        <i class="fa fa-dashboard"></i> <span>Procesos</span>
+                        <span class="pull-right-container">
+                      <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                    </a>
+                    <ul *ngIf="cargomenumonitores" class="treeview-menu">
+                        <li *ngFor="let opmonitor of   pmenumonitores" class="active">
+                            <a href="../{{opmonitor.link}}"> <i class="fa fa-circle-o"></i> {{opmonitor.nombre}}
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-table"></i> <span>Tables</span>
+                        <span class="pull-right-container">
+                      <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><a href="pages/tables/simple.html"><i class="fa fa-circle-o"></i> Simple tables</a></li>
+                        <li><a href="pages/tables/data.html"><i class="fa fa-circle-o"></i> Data tables</a></li>
+                    </ul>
+                </li>
+                <li class="treeview">
+                    <a href="#">
+                        <i class="fa fa-folder"></i> <span>Examples</span>
+                        <span class="pull-right-container">
+                      <i class="fa fa-angle-left pull-right"></i>
+                    </span>
+                    </a>
+                    <ul class="treeview-menu">
+                        <li><a href="pages/examples/invoice.html"><i class="fa fa-circle-o"></i> Invoice</a></li>
+                        <li><a href="pages/examples/profile.html"><i class="fa fa-circle-o"></i> Profile</a></li>
+                        <li><a href="pages/examples/login.html"><i class="fa fa-circle-o"></i> Login</a></li>
+                        <li><a href="pages/examples/register.html"><i class="fa fa-circle-o"></i> Register</a></li>
+                        <li><a href="pages/examples/lockscreen.html"><i class="fa fa-circle-o"></i> Lockscreen</a></li>
+                        <li><a href="pages/examples/404.html"><i class="fa fa-circle-o"></i> 404 Error</a></li>
+                        <li><a href="pages/examples/500.html"><i class="fa fa-circle-o"></i> 500 Error</a></li>
+                        <li><a href="pages/examples/blank.html"><i class="fa fa-circle-o"></i> Blank Page</a></li>
+                        <li><a href="pages/examples/pace.html"><i class="fa fa-circle-o"></i> Pace Page</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <li class="active treeview">
+                <a href="#">
+                    <i class="fa fa-dashboard text-blue"></i>
+                    <span>Monitores</span>
+                    <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+          </span>
+                </a>
+                <ul *ngIf="cargomenumonitores" class="treeview-menu">
+                    <li *ngFor="let opmonitor of   pmenumonitores" class="active">
+                        <a href="../{{opmonitor.link}}">
+                            <!-- <i class="{{opmonitor.grafico}}"></i> -->
+                            <div [innerHtml]="opmonitor.grafico+'   '+opmonitor.nombre"></div>
+                            <!-- <i class="{{opmonitor.grafico}}"></i> -->
+
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </section>
+    <!-- /.sidebar -->
+</aside>

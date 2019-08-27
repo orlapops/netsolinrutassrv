@@ -1,0 +1,995 @@
+<div *ngIf="!vparcaptura">
+</div>
+<div class="alert alert-danger" *ngIf="enerror">
+    {{message}}
+</div>
+<div class="alert alert-danger" *ngIf="enlistaerror">
+    <ul>
+        <li *ngFor="let regerror of listaerrores">
+            {{regerror.menerror}}
+        </li>
+    </ul>
+</div>
+<div class="alert alert-success" *ngIf="!enerror && mostrarmensaje">
+    {{message}}
+</div>
+<kendo-dialog title="Mensaje a Enviar" *ngIf="openedmensaje" (close)="close('cancel')" [minWidth]="250" [width]="450">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <div class="col-xs-12 col-sm-6 col-md-6">
+                    <label>
+                        A:
+                        <kendo-dropdownlist
+                            [(ngModel)]="enviar_a"
+                            isRequired="true"
+                            [data]="listenviara"
+                            [value]="Todos"
+                            (valueChange)="handleEnviarChange($event)"
+                            required
+                        >
+                        </kendo-dropdownlist>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8" *ngIf="idokOnesignal && actusuarenviar">
+            <div class="form-group">
+                <label>             
+                    Asesor:
+                    <kendo-combobox 
+                        [data]="personas" [textField]="'nombre'" [valueField]="'idOnesignal'" isRequired="true" 
+                        [(ngModel)]="idonesignalenviar" [valuePrimitive]="true"
+                        [popupSettings]="{
+                                width: 250
+                        }"
+                        style="width: 250px;">                                      
+                    </kendo-combobox>
+                </label>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="form-group">
+        <label for="asuntomensajeenviar" class="control-label">Asunto</label>
+        <input type="text" class="asunto" [(ngModel)]="asuntomensajeenviar" />
+    </div>
+
+    <div class="form-group">
+        <div>
+            <label for="mensajeenviar" class="control-label">Mensaje</label>
+        </div>
+        <textarea rows="5" cols="75" [(ngModel)]="mensajeenviar"></textarea>
+    </div>
+    <kendo-dialog-actions>
+        <button kendoButton (click)="close('no')">Cancelar</button>
+        <button kendoButton (click)="close('yes')" primary="true">Enviar</button>
+    </kendo-dialog-actions>
+</kendo-dialog>
+
+<kendo-dialog title="Actualizar estadisticas mes" *ngIf="openedestadis" (close)="closeesta('cancel')" [minWidth]="250" [width]="450">
+    <div class="form-group">
+        <label for="repro_solomes" class="control-label">Reprocesa solo mes: {{resummes}}</label>
+        <input type="checkbox" class="asunto" [(ngModel)]="repro_solomes" />
+    </div>
+
+    <div class="form-group">
+        <label for="asuntomensajeenviar" class="control-label">Seguro ejecutar proceso estadisticas para asesor y mes seleccionado?</label>
+    </div>
+
+    <kendo-dialog-actions>
+        <button kendoButton (click)="closeesta('no')">Cancelar</button>
+        <button kendoButton (click)="closeesta('yes')" primary="true">Si</button>
+    </kendo-dialog-actions>
+</kendo-dialog>
+
+<!-- aqui ventanas modal para la adicion de otras tablas desde este modulo -->
+<!-- <mant-cliepoten ptitulo="Consultar Cliente potencial." *ngIf="consultacliepoten" (evenclose)="closeconsulta('cliepoten')" pvaparam="VPARCLIENPOTEN" pobjeto="CRMCLIENTECP01" ptipomant="C" [pid]="id_cliepoten"></mant-cliepoten> -->
+<div *ngIf="resultados" class="row">
+    <div class="row netsmonifilmentop">
+        <div class="col-md-12 col-xs-12 col-sm-6 col-lg-6 netsmonibotonmentop">
+            <p class="k-block">
+                <button class="netsmonibotonmentop" kendoButton *ngIf="cargovendedor && !openedmensaje" (click)="open()" [look]="'flat'" [icon]="'plus'" [primary]="true">Enviar Mensaje</button>
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-xs-12 col-sm-6 col-lg-6 netsmonibotonmentop">
+            <strong>Monitor Personal {{regVendedor.detalle}}
+      </strong>
+            <!-- <form class="navbar-form navbar-right" role="search" method="POST" action="<%=llinkbot%>">
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon">Año</div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-default" id=submit1 name=BA>Consultar</button>
+            </form> -->
+        </div>
+    </div>
+    <div *ngIf="cargovendedor" class="row">
+        <kendo-splitter-pane>
+            <kendo-tabstrip>
+                <kendo-tabstrip-tab [title]="'Ruta Activa'" [selected]="true">
+                    <ng-template kendoTabContent>
+                        <kendo-splitter-pane>
+                            <kendo-tabstrip #tabstripseg [ngStyle]="{'background-color':'#e2eef5'}">
+                                <kendo-tabstrip-tab [title]="'Mapa'" [selected]="true">
+                                    <ng-template kendoTabContent>
+                                        <div [ngStyle]="{'background-color':'#e2eef5'}">
+                                            <h3 class="divprincipal alert-muted text-center ">
+                                                Ruta Activa
+                                            </h3>
+                                            <div class="box-body">
+                                                <div>
+                                                    <agm-map [latitude]="lat" [longitude]="lng" [zoom]="13">
+                                                        <!-- [iconUrl]="'/src/assets/pinmapa.png'" -->
+                                                        <agm-marker *ngFor="let visita of visitas" [latitude]="visita.latitud" [longitude]="visita.longitud" [label]="{color: '#3665e6', text: visita.nombre, fontSize: '8px'}">
+                                                            <agm-info-window #window>
+                                                                <h6 *ngIf="visita.estado==='C' " class="box box-danger">{{visita.cod_tercer}} - {{visita.nombre}}</h6>
+                                                                <h6 *ngIf="visita.estado==='P' " class="box box-info">{{visita.cod_tercer}} - {{visita.nombre}}</h6>
+                                                                <h6 *ngIf="visita.estado==='A' " class="box box-success">{{visita.cod_tercer}} - {{visita.nombre}}</h6>
+                                                                <h6>{{visita.direccion}} </h6>
+                                                                <h6>{{visita.fecha_in | date: 'shortDate'}} - {{visita.hora_in}} </h6>
+                                                            </agm-info-window>
+                                                        </agm-marker>
+                                                        <!-- <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker> -->
+                                                    </agm-map>
+
+                                                </div>
+                                            </div>
+                                            <!-- <lista-busqueda ptablab="COTIZACRM_C" paplica="21" porden="2" [filtro]="filtrocotiza" lobjbusqueda="BUSMONICOTIZAENPROCR" title="Click para consultar la cotización" objeto="CRMCOTIZA" rutamant="cotizacion/VARPARCOTIZACRM_C/">
+                                            </lista-busqueda> -->
+
+                                        </div>
+                                    </ng-template>
+                                </kendo-tabstrip-tab>
+                                <kendo-tabstrip-tab [title]="'Por Estado'">
+                                    <ng-template kendoTabContent>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div *ngIf="!esconder" class="box box-success">
+                                                    <div class="box-header with-border">
+                                                        <h3 class="box-title">Visitas Cumplidas</h3>
+                                                        <!-- <div class="box-tools pull-right">
+                                                            <button *ngIf="collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-plus"></i></button>
+                                                            <button *ngIf="!collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-minus"></i></button>
+                                                            <button class="btn btn-box-tool" data-widget="remove" (click)="esconderpanel()"><i class="fa fa-times"></i></button>
+                                                        </div> -->
+                                                    </div>
+                                                    <div *ngIf="!collapse" class="box-body">
+                                                        <div *ngIf="!collapse" class="box-body">
+                                                            <ul class="products-list product-list-in-box">
+                                                                <li class="item" *ngFor="let visita of visitas_cumplidas">
+                                                                    <div class="direct-chat-info clearfix">
+                                                                        <a (click)="monitorClick(visita)" class="product-title">{{visita.cod_tercer}} - {{visita.nombre}} <span class="label label-warning pull-right">{{service.cadafecha(visita.fecha_in) | date: 'mediumDate'}} - {{service.cadhoramil(visita.hora_in)}}</span></a>
+                                                                        <span class="product-description">
+                                                                                                              {{visita.notas}}
+                                                                                                            </span>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div *ngIf="!esconder" class="box box-danger">
+                                                    <div class="box-header with-border">
+                                                        <h3 class="box-title">Visitas en curso</h3>
+                                                        <!-- <div class="box-tools pull-right">
+                                                            <button *ngIf="collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-plus"></i></button>
+                                                            <button *ngIf="!collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-minus"></i></button>
+                                                            <button class="btn btn-box-tool" data-widget="remove" (click)="esconderpanel()"><i class="fa fa-times"></i></button>
+                                                        </div> -->
+                                                    </div>
+
+                                                    <div *ngIf="!collapse" class="box-body">
+                                                        <div *ngIf="!collapse" class="box-body">
+                                                            <ul class="products-list product-list-in-box">
+                                                                <li class="item" *ngFor="let visita of visitas_encurso">
+                                                                    <div class="direct-chat-info clearfix">
+                                                                        <a (click)="monitorClick(visita)" class="product-title">{{visita.cod_tercer}} - {{visita.nombre}} <span class="label label-warning pull-right">{{service.cadafecha(visita.fecha_in) | date: 'mediumDate'}} - {{service.cadhoramil(visita.hora_in)}}</span></a>
+                                                                        <span class="product-description">
+                                                                                                          {{visita.notas}}
+                                                                                                        </span>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div *ngIf="!esconder" class="box box-info">
+                                                    <div class="box-header with-border">
+                                                        <h3 class="box-title">Visitas Pendientes</h3>
+                                                        <!-- <div class="box-tools pull-right">
+                                                            <button *ngIf="collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-plus"></i></button>
+                                                            <button *ngIf="!collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-minus"></i></button>
+                                                            <button class="btn btn-box-tool" data-widget="remove" (click)="esconderpanel()"><i class="fa fa-times"></i></button>
+                                                        </div> -->
+                                                    </div>
+                                                    <div *ngIf="!collapse" class="box-body">
+                                                        <div *ngIf="!collapse" class="box-body">
+                                                            <ul class="products-list product-list-in-box">
+                                                                <li class="item" *ngFor="let visita of visitas_pendientes">
+                                                                    <div class="direct-chat-info clearfix">
+                                                                        <a (click)="monitorClick(visita)" class="product-title">{{visita.cod_tercer}} - {{visita.nombre}} <span class="label label-warning pull-right">{{service.cadafecha(visita.fecha_in) | date: 'mediumDate'}} - {{service.cadhoramil(visita.hora_in)}}</span></a>
+                                                                        <span class="product-description">
+                                                                                                              {{visita.notas}}
+                                                                                                            </span>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <!--  -->
+                                                <div *ngIf="!esconder" class="box box-info">
+                                                    <div class="box-header with-border">
+                                                        <h3 class="box-title">Llamadas</h3>
+                                                    </div>
+                                                    <div *ngIf="!collapse" class="box-body">
+                                                        <div *ngIf="!collapse" class="box-body">
+                                                            <ul class="products-list product-list-in-box ">
+                                                                <li class="item" *ngFor="let visita of visitas_xllamada">
+
+                                                                    <div *ngIf="visita.estado !== 'C'" class="direct-chat-danger clearfix" style="background-color: aliceblue;}">
+                                                                        <a (click)="monitorClick(visita)" class="product-title">{{visita.cod_tercer}} - {{visita.nombre}} <span class="label label-warning pull-right">{{service.cadafecha(visita.fecha_in) | date: 'mediumDate'}} - {{service.cadhoramil(visita.hora_in)}}</span></a>
+                                                                        <span class="product-description">
+                                                                             {{visita.notas}}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div *ngIf="visita.estado === 'C'" class="direct-chat-danger clearfix" style="background-color: lightgreen;}">
+                                                                        <a (click)="monitorClick(visita)" class="product-title">{{visita.cod_tercer}} - {{visita.nombre}} <span class="label label-warning pull-right">{{service.cadafecha(visita.fecha_in) | date: 'mediumDate'}} - {{service.cadhoramil(visita.hora_in)}}</span></a>
+                                                                        <span class="product-description">
+                                                                                 {{visita.notas}}
+                                                                            </span>
+                                                                    </div>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </ng-template>
+                                </kendo-tabstrip-tab>
+                            </kendo-tabstrip>
+                        </kendo-splitter-pane>
+                    </ng-template>
+                </kendo-tabstrip-tab>
+                <kendo-tabstrip-tab [title]="'Trayecto'" [selected]="false">
+                    <ng-template kendoTabContent>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="box-body">
+                                    <div>
+                                        <div class="list-group">
+                                            Año:
+                                            <a (click)="selecanorecorrido(ano)" *ngFor="let ano of anosrecorrido" class="list-group-item list-group-item-action">
+                                                                                    {{ ano.id }}
+                                                                                </a>
+                                        </div>
+                                        <div class="list-group menulinea">
+                                            {{' ' }} Mes:
+                                            <a (click)="selecmesrecorrido(mes)" *ngFor="let mes of mesesrecorrido" class="list-group-item list-group-item-action">
+                                                                                        {{ mes.id }}
+                                                                                    </a>
+                                        </div>
+                                        <br>
+                                        <div class='divdias'>
+                                            <div class="list-group menulinea">
+                                                Día:
+                                                <a (click)="selecdiarecorrido(dia)" *ngFor="let dia of diasrecorrido" class="list-group-item list-group-item-action">
+                                                                                          {{ dia.id }}
+                                                                                      </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="!esconder" class="box box-warning">
+                                    <div class="box-header with-border">
+
+                                        <h3 class="box-title">Seguimiento de Historial Año: {{recoano}} Mes: {{recmes}} Día: {{recdia}}</h3>
+                                        <div class="box-tools pull-right">
+                                            <button *ngIf="collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-plus"></i></button>
+                                            <button *ngIf="!collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-minus"></i></button>
+                                            <button class="btn btn-box-tool" data-widget="remove" (click)="esconderpanel()"><i class="fa fa-times"></i></button>
+                                        </div>
+                                    </div>
+                                    <!-- <div *ngIf="!collapse" class="box-body">
+                                        <a *ngFor="let historial of historialrecorrido" class="list-group-item list-group-item-action">
+                                                    {{ historial.id }}
+                                                    {{ historial.latitud }}
+                                                </a>
+
+                                    </div> -->
+                                    <div class="box-body">
+                                        <div class="row">
+                                            <div class="col-md-7">
+                                                <div class="row">
+                                                    <div *ngIf="cargo_historialrecorido">
+                                                        <!-- <agm-map [latitude]="latrecorrido" [longitude]="lngrecorrido" [zoom]="13"> -->
+                                                        <agm-map [latitude]="latrecorrido" [longitude]="lngrecorrido" [zoom]="13">
+                                                            <!-- <agm-map> -->
+                                                            <!-- [iconUrl]="'/src/assets/pinmapa.png'" -->
+                                                            <agm-marker *ngFor="let hist of historialrecorrido" [latitude]="hist.latitud" [longitude]="hist.longitud" [label]="{color: '#fff', text: hist.hora, fontSize: '10px'}">
+                                                                <agm-info-window #window>
+                                                                    <h6>{{hist.hora}} </h6>
+                                                                </agm-info-window>
+                                                            </agm-marker>
+                                                            <!-- <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker> -->
+                                                        </agm-map>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <div class="row">
+                                                    <!-- TABLE: LATEST ORDERS -->
+                                                    <div class="box box-primary">
+                                                        <div class="box-header with-border">
+                                                            <h3 class="box-title">Trayecto</h3>
+                                                            <div class="box-tools pull-right">
+                                                                <!-- <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                                                    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button> -->
+                                                            </div>
+                                                        </div>
+                                                        <div class="box-body">
+                                                            <div *ngIf="cargo_trayectonetsolin">
+                                                                <div class="list-groupvc">
+                                                                    <a (click)="monitorClick(visita)" *ngFor="let visita of trayectodia" class="list-group-itemvc list-group-item-action">
+                                                                        <i *ngIf="visita.esxllam" class="fa fa-phone"></i>
+                                                                        <i *ngIf="!visita.esxllam" class="fa fa-home"></i> {{visita.cod_clie}} - {{visita.cliente}} Ini: {{visita.fec_ingreso | date: 'shortTime'}} Fin: {{visita.fec_cierre | date: 'shortTime'}}
+                                                                        <span class="label label-success pull-right mustratiempo"><i class="fa fa-clock-o "></i> {{visita.minutos}} </span>
+                                                                    </a>
+                                                                    <br>
+                                                                </div>
+                                                                <!-- <div class="list-groupvc">
+                                                                        <a (click)="monitorClick(visita)" *ngFor="let visita of visicumplidiaresum" class="list-group-itemvc list-group-item-action">
+                                                                            <i *ngIf="visita.llamada" class="fa fa-phone"></i>
+                                                                            <i *ngIf="!visita.llamada" class="fa fa-home"></i> {{visita.cod_tercer}} - {{visita.nombre}}
+                                                                            <span *ngIf="visita.fechahora_cierre" class="label label-primary pull-right">{{visita.fechahora_cierre | date: 'medium'}} </span>
+                                                                            <span *ngIf="visita.fechacierre" class="label label-primary pull-right">{{visita.fechacierre | date: 'medium'}} </span>
+                                                                        </a>
+                                                                        <br>
+                                                                    </div> -->
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- <monitor-objtabla objeto="MONTABCOTIZUSUAR" minimizada="NO" titulo="En proceso" color="info" [paramobj]="paramocotizaenproceso"></monitor-objtabla> -->
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </ng-template>
+                </kendo-tabstrip-tab>
+                <kendo-tabstrip-tab [title]="'Resumen Diario'">
+                    <ng-template kendoTabContent>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="box-body">
+                                    <div>
+                                        <div class="list-group">
+                                            Año:
+                                            <a (click)="selecanoresum(ano)" *ngFor="let ano of anosresum" class="list-group-item list-group-item-action">
+                                                                                            {{ ano.id }}
+                                                                                        </a>
+                                        </div>
+                                        <div class="list-group menulinea">
+                                            {{' ' }} Mes:
+                                            <a (click)="selecmesresum(mes)" *ngFor="let mes of mesesresum" class="list-group-item list-group-item-action">
+                                                                                                {{ mes.id }}
+                                                                                            </a>
+                                        </div>
+                                        <br>
+                                        <div class='divdias'>
+                                            <div class="list-group menulinea">
+                                                Día:
+                                                <a (click)="selecdiaresum(dia)" *ngFor="let dia of diasresum" class="list-group-item list-group-item-action">
+                                                                                                  {{ dia.id }}
+                                                                                              </a>
+                                            </div>
+                                        </div>
+                                        <h6 class="box-title">Selección: {{resumano}} Mes: {{resummes}} Día: {{resumdia}}</h6>
+                                        <!-- <p class="k-block"> -->
+                                        <button class="netsmonibotonmentop" kendoButton *ngIf="(usuario ==='NETSDESAA' || usuario ==='NETSOLIN') &&  cargovendedor && !openedestadis" (click)="openesta()" [look]="'flat'" [icon]="'plus'" [primary]="true">Reprocesar estadisticas.</button>
+                                        <h6 *ngIf="(usuario ==='NETSDESAA' || usuario ==='NETSOLIN') &&  cargovendedor && !openedestadis" class="box-title"> {{men_proceso}}</h6>
+
+                                        <!-- </p> -->
+
+                                    </div>
+                                </div>
+                                <div>
+                                    <kendo-splitter-pane>
+                                        <kendo-tabstrip #tabstripseg [ngStyle]="{'background-color':'#e2eef5'}">
+                                            <kendo-tabstrip-tab [title]="'Visitas'" [selected]="true">
+                                                <ng-template kendoTabContent>
+                                                    <div [ngStyle]="{'background-color':'#e2eef5'}">
+                                                        <h3 class="divprincipal alert-muted text-center ">
+                                                            <h3 class="box-title">Visitas Cumplidas </h3>
+                                                        </h3>
+                                                        <div class="box-body">
+                                                            <div class="row">
+                                                                <div class="col-md-7">
+                                                                    <div class="row">
+                                                                        <!-- TABLE: LATEST ORDERS -->
+                                                                        <div class="box box-red">
+                                                                            <div class="box-header with-border">
+                                                                                <h3 class="box-title">Mapa </h3>
+                                                                                <div class="box-tools pull-right">
+                                                                                    <!-- <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                                                                    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button> -->
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="box-body">
+                                                                                <div>
+                                                                                    <agm-map [latitude]="lat" [longitude]="lng" [zoom]="13">
+                                                                                        <!-- [iconUrl]="'/src/assets/pinmapa.png'" -->
+                                                                                        <agm-marker *ngFor="let visita of visicumplidiaresum" [latitude]="visita.lat_cierre" [longitude]="visita.long_cierre" [label]="{color: '#3665e6', text: visita.nombre, fontSize: '8px'}">
+                                                                                            <agm-info-window #window>
+                                                                                                <h6>Nombre: {{visita.nombre}}</h6>
+                                                                                                <h6>Dirección: {{visita.direccion}}</h6>
+                                                                                                <h6>Hora Cierre: {{visita.fechahora_cierre | date: 'shortTime'}}</h6>
+                                                                                            </agm-info-window>
+                                                                                        </agm-marker>
+                                                                                        <!-- <agm-marker [latitude]="lat" [longitude]="lng"></agm-marker> -->
+                                                                                    </agm-map>
+
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- <monitor-objtabla objeto="MONTABCOTIZUSUAR" minimizada="SI" titulo="En borrador" color="warning" [paramobj]="paramocotizaborrador"></monitor-objtabla> -->
+                                                                </div>
+                                                                <div class="col-md-5">
+                                                                    <div class="row">
+                                                                        <!-- TABLE: LATEST ORDERS -->
+                                                                        <div class="box box-primary">
+                                                                            <div class="box-header with-border">
+                                                                                <h3 class="box-title">Visitas</h3>
+                                                                                <div class="box-tools pull-right">
+                                                                                    <!-- <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                                                                                    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button> -->
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="box-body">
+                                                                                <div>
+                                                                                    <div class="list-groupvc">
+                                                                                        <a (click)="monitorClick(visita)" *ngFor="let visita of visicumplidiaresum" class="list-group-itemvc list-group-item-action">
+                                                                                            <i *ngIf="visita.llamada" class="fa fa-phone"></i>
+                                                                                            <i *ngIf="!visita.llamada" class="fa fa-home"></i> {{visita.cod_tercer}} - {{visita.nombre}}
+                                                                                            <span *ngIf="visita.fechahora_cierre" class="label label-primary pull-right">{{visita.fechahora_cierre | date: 'medium'}} </span>
+                                                                                            <span *ngIf="visita.fechacierre" class="label label-primary pull-right">{{visita.fechacierre | date: 'medium'}} </span>
+                                                                                        </a>
+                                                                                        <br>
+                                                                                    </div>
+
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <!-- <monitor-objtabla objeto="MONTABCOTIZUSUAR" minimizada="NO" titulo="En proceso" color="info" [paramobj]="paramocotizaenproceso"></monitor-objtabla> -->
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </ng-template>
+                                            </kendo-tabstrip-tab>
+                                            <kendo-tabstrip-tab [title]="'Recibos de Caja'">
+                                                <ng-template kendoTabContent>
+                                                    <div class="row">
+                                                        <kendo-splitter-pane>
+                                                            <kendo-tabstrip #tabstripseg [ngStyle]="{'background-color':'#e2eef5'}">
+
+                                                                <kendo-tabstrip-tab [title]="recibo.cod_docume+'/'+recibo.num_docume" *ngFor="let recibo of recibosresum">
+                                                                    <ng-template kendoTabContent>
+                                                                        <div [ngStyle]="{'background-color':'#e2eef5'}">
+                                                                            <h5 class="divprincipal alert-muted text-center ">
+                                                                                <a (click)="monitorClick(recibo)" class="product-title">Monitor: {{recibo.cod_docume}} - {{recibo.num_docume}} {{recibo.detalle[0].cliente}} <span class="label label-warning pull-right">{{recibo.fecha | date: 'shortDate'}} </span></a>
+                                                                            </h5>
+                                                                            <div class="box-body">
+                                                                                <div class="row">
+                                                                                    <div class="col-md-12">
+                                                                                        <div class="box box-primary">
+                                                                                            <div class="box-header with-border">
+                                                                                                <form #form="ngForm">
+                                                                                                    <label>
+                                                                                                              Verificado:
+                                                                                                                 <kendo-switch
+                                                                                                                  name="switch"
+                                                                                                                  [onLabel]="'Si'" 
+                                                                                                                  [offLabel]="'No'"
+                                                                                                                  [(ngModel)]="recibo.verificado"
+                                                                                                                  (valueChange)="onValuechangeverifica($event, recibo)"
+                                                                                                                >
+                                                                                                                </kendo-switch> <br />                                                                                                                
+                                                                                                              </label>
+                                                                                                    <label *ngIf="recibo.verificado">    Verificado por: {{recibo.nomusua_verifica}} - {{recibo.fecha_verifica.toDate() |   date: 'medium'}}</label>
+                                                                                                </form>
+                                                                                                <!-- <div class="checkbox checkbox-primary p-t-0">
+                                                                                                    <label for="checkbox-signup"> Verificado </label>                                                                                                    
+                                                                                                    <kendo-switch [(ngModel)]="recibo.verificado" [onLabel]="'Si'" [offLabel]="'No'"></kendo-switch>
+                                                                                                </div> -->
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row">
+                                                                                    <div class="col-md-6">
+                                                                                        <div class="box box-primary">
+                                                                                            <div class="box-header with-border">
+                                                                                                <h3 class="box-title">Detalle Recibo</h3>
+                                                                                                <!-- <span class="label label-primary pull-right"><i class="fa fa-html5"></i></span> -->
+                                                                                            </div>
+                                                                                            <ul class="products-list product-list-in-box">
+
+                                                                                                <div class="box-body">
+                                                                                                    <div class="table-responsive">
+                                                                                                        <table class="tabla">
+                                                                                                            <tbody>
+                                                                                                                <li *ngFor="let rdeta of recibo.detalle; let i = index;">
+                                                                                                                    <thead>
+                                                                                                                        <tr *ngIf="i===0" class="filatabla">
+                                                                                                                            <th class="coldescri">Descripción</th>
+                                                                                                                            <th class="colrefer">Referencia</th>
+                                                                                                                            <th class="colvalor">Valor</th>
+                                                                                                                        </tr>
+                                                                                                                    </thead>
+                                                                                                                    <tr class="filatabla">
+                                                                                                                        <td class="coldescri">{{rdeta.descripcio}}</td>
+                                                                                                                        <td class="colrefer">{{rdeta.doc_afecta}}</td>
+                                                                                                                        <td class="colvalor">{{rdeta.valor | currency}}</td>
+                                                                                                                    </tr>
+                                                                                                                    <!-- /.box-body -->
+                                                                                                                </li>
+                                                                                                                <!-- <thead>
+                                                                                                                <tr class="filatabla">
+                                                                                                                    <th class="colrefer">Total</th>
+                                                                                                                    <th class="coldescri"></th>
+                                                                                                                    <th class="colcant"></th>
+                                                                                                                    <th class="colvalor">{{totalpedido(pedido.detalle) | currency}}</th>
+                                                                                                                </tr>
+                                                                                                            </thead> -->
+                                                                                                            </tbody>
+                                                                                                        </table>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-md-6 clearfix">
+                                                                                        <div class="box box-primary clearfix">
+                                                                                            <div class="box-header with-border">
+                                                                                                <h3 class="box-title">Formas de pago Recibo</h3>
+                                                                                                <!-- <span class="label label-primary pull-right"><i class="fa fa-html5"></i></span> -->
+                                                                                            </div>
+                                                                                            <ul class="products-list product-list-in-box">
+
+                                                                                                <div class="box-body">
+                                                                                                    <div class="table-responsive">
+                                                                                                        <table class="tabla">
+                                                                                                            <tbody>
+                                                                                                                <li *ngFor="let rdeta of recibo.objformpag; let i = index;">
+                                                                                                                    <thead>
+                                                                                                                        <tr *ngIf="i===0" class="filatabla">
+                                                                                                                            <th class="coldescri">Tipo</th>
+                                                                                                                            <th class="coldescri">Banco</th>
+                                                                                                                            <th class="coldescri">Cta</th>
+                                                                                                                            <th class="coldescri">Referencia</th>
+                                                                                                                            <th class="colrefer">Nota</th>
+                                                                                                                            <th class="colvalor">Valor</th>
+                                                                                                                        </tr>
+                                                                                                                    </thead>
+                                                                                                                    <tr class="filatabla">
+                                                                                                                        <td class="coldescri">{{rdeta.item.tipopago}}</td>
+                                                                                                                        <td class="coldescri">{{rdeta.item.banco}}</td>
+                                                                                                                        <td class="coldescri">{{rdeta.item.cta_banco}}</td>
+                                                                                                                        <td class="coldescri">{{rdeta.item.referencia}}</td>
+                                                                                                                        <td class="coldescri">{{rdeta.item.nota}}</td>
+                                                                                                                        <td class="colvalor">{{rdeta.item.valor | currency}}</td>
+                                                                                                                    </tr>
+                                                                                                                    <!-- /.box-body -->
+                                                                                                                </li>
+                                                                                                                <!-- <thead>
+                                                                                                                    <tr class="filatabla">
+                                                                                                                        <th class="colrefer">Total</th>
+                                                                                                                        <th class="coldescri"></th>
+                                                                                                                        <th class="colcant"></th>
+                                                                                                                        <th class="colvalor">{{totalpedido(pedido.detalle) | currency}}</th>
+                                                                                                                    </tr>
+                                                                                                                </thead> -->
+                                                                                                            </tbody>
+                                                                                                        </table>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div>
+
+                                                                                </div>
+                                                                                <div class="row">
+                                                                                    <div class="col-md-8">
+                                                                                        <div class="box box-primary">
+                                                                                            <div class="box-header with-border">
+                                                                                                <h3 class="box-title">Recibo Impresión</h3>
+                                                                                                <!-- <span class="label label-primary pull-right"><i class="fa fa-html5"></i></span> -->
+                                                                                            </div>
+                                                                                            <!-- /.box-header -->
+                                                                                            <div class="box-body">
+                                                                                                <!-- <textarea rows="20" cols="12" class="form-control" [formControlName]="recibo.txt_imp" [id]="recibo.txt_imp"> -->
+                                                                                                <textarea rows="20" cols="80">
+                                                                                                                        {{recibo.txt_imp}}
+                                                                                                        </textarea>
+
+                                                                                            </div>
+                                                                                            <!-- /.box-body -->
+                                                                                        </div>
+                                                                                        <!-- /.box -->
+
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </ng-template>
+                                                                </kendo-tabstrip-tab>
+                                                            </kendo-tabstrip>
+                                                        </kendo-splitter-pane>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div *ngIf="!esconder" class="box box-success">
+                                                                <div class="box-header with-border">
+                                                                    <h3 class="box-title">Recibos de caja</h3>
+                                                                    <div class="box-tools pull-right">
+                                                                        <button *ngIf="collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-plus"></i></button>
+                                                                        <button *ngIf="!collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-minus"></i></button>
+                                                                        <button class="btn btn-box-tool" data-widget="remove" (click)="esconderpanel()"><i class="fa fa-times"></i></button>
+                                                                    </div>
+                                                                </div>
+                                                                <div *ngIf="!collapse" class="box-body">
+                                                                    <ul class="products-list product-list-in-box">
+                                                                        <li class="item" *ngFor="let recibo of recibosresum">
+                                                                            <div *ngIf="!recibo.verificado" class="warning">
+                                                                                <a target="_blank" [href]="linkrecibo(recibo.cod_docume,recibo.num_docume,recibo.fecha)" class="product-title">{{recibo.cod_docume}} - {{recibo.num_docume}} 
+                                                                                    <span class="label label-warning pull-right">{{recibo.fecha | date: 'shortDate'}} </span></a>
+                                                                                <span class="product-description">
+                                                                                                              <!-- {{visita.notas}} -->
+                                                                                                            </span>
+                                                                            </div>
+                                                                            <div *ngIf="recibo.verificado" class="success">
+                                                                                <a target="_blank" [href]="linkrecibo(recibo.cod_docume,recibo.num_docume,recibo.fecha)" class="product-title">{{recibo.cod_docume}} - {{recibo.num_docume}} 
+                                                                                        Verificado por: {{recibo.nomusua_verifica}} - {{recibo.fecha_verifica.toDate() |   date: 'medium'}}
+                                                                                        <span class="label label-warning pull-right">{{recibo.fecha | date: 'shortDate'}} </span></a>
+                                                                                <span class="product-description">
+                                                                                                                  <!-- {{visita.notas}} -->
+                                                                                                                </span>
+                                                                            </div>
+
+
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </ng-template>
+                                            </kendo-tabstrip-tab>
+                                            <kendo-tabstrip-tab [title]="'Consignaciones'">
+                                                <ng-template kendoTabContent>
+                                                    <div class="row">
+                                                        <kendo-splitter-pane>
+                                                            <kendo-tabstrip #tabstripseg [ngStyle]="{'background-color':'#e2eef5'}">
+
+                                                                <kendo-tabstrip-tab [title]="consig.cod_docume+'/'+consig.num_docume" *ngFor="let consig of consignacionesresum">
+                                                                    <ng-template kendoTabContent>
+                                                                        <div [ngStyle]="{'background-color':'#e2eef5'}">
+                                                                            <h5 class="divprincipal alert-muted text-center ">
+                                                                                <a (click)="monitorClick(consig)" class="product-title">Monitor: {{consig.cod_docume}} - {{consig.num_docume}} <span class="label label-warning pull-right">{{consig.fecha | date: 'shortDate'}} </span></a>
+                                                                            </h5>
+                                                                            <div class="box-body">
+                                                                                <div class="row">
+                                                                                    <div class="col-md-9">
+                                                                                        <!-- Widget: user widget style 1 -->
+                                                                                        <div class="box box-widget widget-visita-2">
+                                                                                            <!-- Add the bg color to the header using any of the bg-* classes -->
+                                                                                            <div>
+                                                                                                <div class="widget-visita-image">
+                                                                                                    <img *ngIf="consig.link_imgfb" [src]="cleanURL(consig.link_imgfb)" />
+                                                                                                    <img *ngIf="!consig.link_imgfb" src="assets/img/imagennodisponible.jpg" />
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-md-3">
+                                                                                        <div class="box box-primary">
+                                                                                            <div class="box-header with-border">
+                                                                                                <form #form="ngForm">
+                                                                                                    <label>
+                                                                                                                  Verificado:
+                                                                                                                     <kendo-switch
+                                                                                                                      name="switch"
+                                                                                                                      [onLabel]="'Si'" 
+                                                                                                                      [offLabel]="'No'"
+                                                                                                                      [(ngModel)]="consig.verificado"
+                                                                                                                      (valueChange)="onValuechangeverificaconsig($event, consig)"
+                                                                                                                    >
+                                                                                                                    </kendo-switch> <br />                                                                                                                
+                                                                                                                  </label>
+                                                                                                    <label *ngIf="consig.verificado">    Verificado por: {{consig.nomusua_verifica}} - {{consig.fecha_verifica.toDate() |   date: 'medium'}}</label>
+                                                                                                </form>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row">
+                                                                                    <div class="col-md-6">
+                                                                                        <div class="box box-primary">
+                                                                                            <div class="box-header with-border">
+                                                                                                <h3 class="box-title">Detalle Consignación {{consig.referencia}}</h3>
+                                                                                            </div>
+                                                                                            <ul class="products-list product-list-in-box">
+
+                                                                                                <div class="box-body">
+                                                                                                    <div class="table-responsive">
+                                                                                                        <table class="tabla">
+                                                                                                            <tbody>
+                                                                                                                <li *ngFor="let rdeta of consig.detalle; let i = index;">
+                                                                                                                    <thead>
+                                                                                                                        <tr *ngIf="i===0" class="filatabla">
+                                                                                                                            <th class="coldescri">Descripción</th>
+                                                                                                                            <th class="colvalor">Naturaleza</th>
+                                                                                                                            <th class="colrefer">Referencia</th>
+                                                                                                                            <th class="colvalor">Valor</th>
+                                                                                                                        </tr>
+                                                                                                                    </thead>
+                                                                                                                    <tr class="filatabla">
+                                                                                                                        <td class="coldescri">{{rdeta.descripcio}}</td>
+                                                                                                                        <td class="colrefer">{{rdeta.doc_afecta}}</td>
+                                                                                                                        <td class="colvalor">{{rdeta.naturaleza }}</td>
+                                                                                                                        <td class="colvalor">{{rdeta.valor | currency}}</td>
+                                                                                                                    </tr>
+                                                                                                                </li>
+                                                                                                            </tbody>
+                                                                                                        </table>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </ul>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-md-6">
+                                                                                        <div class="box box-primary">
+                                                                                            <div class="box-header with-border">
+                                                                                                <h3 class="box-title">Consignación Impresión</h3>
+                                                                                            </div>
+                                                                                            <div class="box-body">
+                                                                                                <textarea rows="20" cols="80">
+                                                                                                                    {{consig.txt_imp}}
+                                                                                                    </textarea>
+
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </ng-template>
+                                                                </kendo-tabstrip-tab>
+                                                            </kendo-tabstrip>
+                                                        </kendo-splitter-pane>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div *ngIf="!esconder" class="box box-success">
+                                                                <div class="box-header with-border">
+                                                                    <h3 class="box-title">Consignaciones</h3>
+                                                                    <div class="box-tools pull-right">
+                                                                        <button *ngIf="collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-plus"></i></button>
+                                                                        <button *ngIf="!collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-minus"></i></button>
+                                                                        <button class="btn btn-box-tool" data-widget="remove" (click)="esconderpanel()"><i class="fa fa-times"></i></button>
+                                                                    </div>
+                                                                </div>
+                                                                <div *ngIf="!collapse" class="box-body">
+                                                                    <ul class="products-list product-list-in-box">
+                                                                        <li class="item" *ngFor="let consig of consignacionesresum">
+                                                                            <div *ngIf="!consig.verificado" class="warning">
+                                                                                <a target="_blank" [href]="linkconsigna(consig.cod_docume,consig.num_docume,consig.fecha)" class="product-title">{{consig.cod_docume}} - {{consig.num_docume}} 
+                                                                                        <span class="label label-warning pull-right">{{consig.fecha | date: 'shortDate'}} </span></a>
+                                                                                <span class="product-description">
+                                                                                                                  <!-- {{visita.notas}} -->
+                                                                                                                </span>
+                                                                            </div>
+                                                                            <div *ngIf="consig.verificado" class="success">
+                                                                                <a target="_blank" [href]="linkconsigna(consig.cod_docume,consig.num_docume,consig.fecha)" class="product-title">{{consig.cod_docume}} - {{consig.num_docume}} 
+                                                                                            Verificado por: {{consig.nomusua_verifica}} - {{consig.fecha_verifica.toDate() |   date: 'medium'}}
+                                                                                            <span class="label label-warning pull-right">{{consig.fecha | date: 'shortDate'}} </span></a>
+                                                                                <span class="product-description">
+                                                                                                                    </span>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </ng-template>
+                                            </kendo-tabstrip-tab>
+
+                                            <kendo-tabstrip-tab [title]="'Cierre de Caja'">
+                                                <ng-template kendoTabContent>
+                                                    <div class="row">
+                                                        <div class="col-md-6">
+                                                            <div class="box box-success">
+                                                                <!-- <div class="box-header with-border">
+                                                                    <h3 class="box-title">Efectivo</h3>
+                                                                </div> -->
+                                                                <h5>
+                                                                    Efectivo
+                                                                </h5>
+                                                                <hr class="hrefe">
+                                                                <div class="box-body">
+                                                                    <ul class="products-list product-list-in-box">
+                                                                        <li class="item" *ngFor="let cieefe of cierrecajaefe">
+                                                                            <label>{{cieefe.cod_docume}} - {{cieefe.num_docume}} </label>
+                                                                            <span class="label label-warning pull-right spanvalor">{{cieefe.valor | currency }}</span>
+                                                                            <span class="product-description">
+                                                                                                            {{cieefe.referencia}}
+                                                                                                        </span>
+                                                                        </li>
+                                                                    </ul>
+                                                                    <label>Total Efectivo</label>
+                                                                    <span class="label label-success pull-right spanvalor">{{totalforpago(cierrecajaefe) | currency }}</span>
+                                                                </div>
+                                                                <hr class="hrchequed">
+                                                                <h5>
+                                                                    Cheque al día
+                                                                </h5>
+                                                                <hr class="hrchequed">
+                                                                <div class="box-body">
+                                                                    <ul class="products-list product-list-in-box">
+                                                                        <li class="item" *ngFor="let ciechd of cierrecajachd">
+                                                                            <div class="direct-chat-info clearfix">
+                                                                                <label>{{ciechd.cod_docume}} - {{ciechd.num_docume}} </label>
+                                                                                <span class="label label-warning pull-right spanvalor">{{ciechd.valor | currency }}</span>
+                                                                                <p class="product-description">
+                                                                                    Banco: {{ciechd.banco}} Fecha Consignar: {{ciechd.fecha | date: 'mediumDate'}} Núm Cheque: {{ciechd.referencia}}
+                                                                                </p>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                    <label>Total Cheques al día</label>
+                                                                    <span class="label label-success pull-right spanvalor">{{totalforpago(cierrecajachd) | currency }}</span>
+
+                                                                </div>
+                                                                <hr class="hrpbcs">
+                                                                <h5>
+                                                                    Consignaciones Clientes en Bancos
+                                                                </h5>
+                                                                <hr class="hrpbcs">
+                                                                <div class="box-body">
+                                                                    <ul class="products-list product-list-in-box">
+                                                                        <li class="item" *ngFor="let ciepbcs of cierrecajapbcs">
+                                                                            <div class="direct-chat-info clearfix">
+                                                                                <label>{{ciepbcs.cod_docume}} - {{ciepbcs.num_docume}} </label>
+                                                                                <span class="label label-warning pull-right spanvalor">{{ciepbcs.valor | currency }}</span>
+                                                                                <p class="product-description">
+                                                                                    Banco: {{ciepbcs.cta_banco}} Fecha Consignar: {{ciepbcs.fecha | date: 'mediumDate'}} Referencia: {{ciepbcs.referencia}}
+                                                                                </p>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                    <label>Total Consignaciones clientes en bancos</label>
+                                                                    <span class="label label-success pull-right spanvalor">{{totalforpago(cierrecajapbcs) | currency }}</span>
+
+                                                                </div>
+                                                                <hr class="hrpbtr">
+                                                                <h5>
+                                                                    Transferencias Clientes en Bancos
+                                                                </h5>
+                                                                <hr class="hrpbtr">
+                                                                <div class="box-body">
+                                                                    <ul class="products-list product-list-in-box">
+                                                                        <li class="item" *ngFor="let ciepbtr of cierrecajapbtr">
+                                                                            <div class="direct-chat-info clearfix">
+                                                                                <label>{{ciepbtr.cod_docume}} - {{ciepbtr.num_docume}} </label>
+                                                                                <span class="label label-warning pull-right spanvalor">{{ciepbtr.valor | currency }}</span>
+                                                                                <p class="product-description">
+                                                                                    Banco: {{ciepbtr.cta_banco}} Fecha: {{ciepbtr.fecha | date: 'mediumDate'}} Referencia: {{ciepbtr.referencia}}
+                                                                                </p>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                    <label>Total Transferencias clientes en bancos</label>
+                                                                    <span class="label label-success pull-right spanvalor">{{totalforpago(cierrecajapbtr) | currency }}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <div *ngIf="!esconder" class="box box-success">
+                                                                <div class="box-header with-border">
+                                                                    <h3 class="box-title">Consignaciones</h3>
+                                                                    <div class="box-tools pull-right">
+                                                                        <button *ngIf="collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-plus"></i></button>
+                                                                        <button *ngIf="!collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-minus"></i></button>
+                                                                        <button class="btn btn-box-tool" data-widget="remove" (click)="esconderpanel()"><i class="fa fa-times"></i></button>
+                                                                    </div>
+                                                                </div>
+                                                                <div *ngIf="!collapse" class="box-body">
+                                                                    <ul class="products-list product-list-in-box">
+                                                                        <li class="item" *ngFor="let consig of consignacionesresum">
+                                                                            <div *ngIf="!consig.verificado" class="warning">
+                                                                                <a target="_blank" [href]="linkconsigna(consig.cod_docume,consig.num_docume,consig.fecha)" class="product-title">{{consig.cod_docume}} - {{consig.num_docume}} 
+                                                                                            <span class="label label-warning pull-right">{{consig.referencia}} </span></a>
+                                                                                <span class="product-description">Efectivo: {{totalconsig(consig.efectivo) | currency }}
+                                                                                        Cheques: {{totalconsig(consig.cheques) | currency }} Ajuste: {{consig.ajuste | currency }} Consignado: {{consig.valor  | currency }}
+                                                                                                                    </span>
+                                                                            </div>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </ng-template>
+                                            </kendo-tabstrip-tab>
+                                        </kendo-tabstrip>
+                                    </kendo-splitter-pane>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </ng-template>
+                </kendo-tabstrip-tab>
+                <kendo-tabstrip-tab [title]="'Clientes Potenciales'">
+                    <ng-template kendoTabContent>
+                        <div class="row">
+                            <div class="col-md-12 col-xs-12 col-sm-6 col-lg-6 netsmonibotonmentop">
+                                <div *ngIf="!esconder" class="box box-success">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">Reportados</h3>
+                                    </div>
+                                    <div *ngIf="cargoclienpoten" class="box-body">
+                                        <ul class="products-list product-list-in-box">
+                                            <li class="item" *ngFor="let cliepoten of clientespotenrepor">
+                                                <div class="direct-chat-info clearfix">
+                                                    <a (click)="monitorClickcliepoten(cliepoten)" class="product-title">{{cliepoten.codigo}} - {{cliepoten.nombre}} <span class="label">{{cliepoten.fecha_reporta.toDate() | date: 'mediumDate'}}</span></a>
+                                                    <span class="product-description">{{cliepoten.direccion}}</span>
+                                                    <!-- <span class="product-description">{{cliepoten.contacto}}</span>
+                                                    <span class="product-description">{{cliepoten.telefono + '-'+cliepoten.celular}}</span>
+                                                    <span class="product-description">{{cliepoten.notas}}</span> -->
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                            </div>
+                        </div>
+                    </ng-template>
+                </kendo-tabstrip-tab>
+            </kendo-tabstrip>
+        </kendo-splitter-pane>
+    </div>
+</div>

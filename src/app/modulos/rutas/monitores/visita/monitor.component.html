@@ -1,0 +1,354 @@
+<!-- <div *ngIf="!vparcaptura">
+</div> -->
+<div class="alert alert-danger" *ngIf="enerror">
+    {{message}}
+</div>
+<div class="alert alert-danger" *ngIf="enlistaerror">
+    <ul>
+        <li *ngFor="let regerror of listaerrores">
+            {{regerror.menerror}}
+        </li>
+    </ul>
+</div>
+<div class="alert alert-success" *ngIf="!enerror && mostrarmensaje">
+    {{message}}
+</div>
+<!-- aqui ventanas modal para la adicion de otras tablas desde este modulo -->
+<div class="row">
+    <div class="col-md-12 col-xs-12 col-sm-6 col-lg-12 netsmonibotonmentop">
+        <strong>Monitor Visita</strong>
+        <a *ngIf="cargo_persona" [routerLink]="[retornaRuta('V')]">  Ir a: {{this.persona.nombre}}</a>
+
+    </div>
+</div>
+<div *ngIf="!cargando" class="row">
+    <div class="col-md-4">
+        <!-- Widget: user widget style 1 -->
+        <div class="box box-widget widget-visita-2">
+            <!-- Add the bg color to the header using any of the bg-* classes -->
+            <div [class]="classxestado">
+                <div class="widget-visita-image">
+                    <img *ngIf="cargo_direc && dir_visita.link_foto" [src]="cleanURL(dir_visita.link_foto)" />
+                    <img *ngIf="cargo_direc && !dir_visita.link_foto" src="assets/img/imagennodisponible.jpg" />
+
+                </div>
+                <!-- /.widget-visita-image -->
+                <h3 class="widget-visita-username">{{visita.nombre}}</h3>
+                <h5 class="widget-visita-desc">
+                    <i *ngIf="visita.llamada" class="fa fa-phone"></i>
+                    <i *ngIf="!visita.llamada" class="fa fa-home"></i> Id: {{visita.id_visita}}</h5>
+                <h5 class="widget-visita-desc">Código: {{visita.cod_tercer}}</h5>
+                <h5 *ngIf="cargo_direc" class="widget-visita-desc">Ciudad: {{dir_visita.ciudad}} </h5>
+                <h5 *ngIf="cargo_direc && dir_visita.nom_subzo" class="widget-visita-desc">Zona: {{dir_visita.nom_subzo}} </h5>
+                <h5 *ngIf="cargo_direc && dir_visita.nom_barri" class="widget-visita-desc">Zona: {{dir_visita.nom_barri}} </h5>
+                <h5 class="widget-visita-desc">{{visita.direccion}} </h5>
+                <h5 *ngIf="cargo_direc" class="widget-visita-desc">Contacto: {{dir_visita.contacto}} </h5>
+                <h5 *ngIf="cargo_direc" class="widget-visita-desc">Email: {{dir_visita.email}} </h5>
+                <h5 class="widget-visita-desc">Dirección: {{dir_visita.direccion}} </h5>
+                <h5 class="widget-visita-desc">Long: {{dir_visita.longitud}} Lat: {{dir_visita.latitud}} </h5>
+                <h5 *ngIf="visita.estado==='C'" class="widget-visita-desc">Cerrada</h5>
+                <h5 *ngIf="visita.estado==='A'" class="widget-visita-desc">En Proceso</h5>
+                <h5 *ngIf="visita.estado==='P' || visita.estado===''" class="widget-visita-desc">Pendiente</h5>
+            </div>
+            <!-- <div class="box-body no-padding">
+                <div *ngIf="cargo_direc">
+                    <agm-map [latitude]="dir_visita.latitud" [longitude]="dir_visita.longitud" [zoom]="13">
+                        <agm-marker [latitude]="dir_visita.latitud" [longitude]="dir_visita.longitud">
+                            <agm-info-window #window>
+                                <h6>Dirección: {{dir_visita.direccion}}</h6>
+                            </agm-info-window>
+                        </agm-marker>
+                    </agm-map>
+                </div>
+            </div> -->
+
+            <div class="box-footer no-padding">
+                <ul class="nav nav-stacked">
+                    <li>Fecha Programada: <span class="direct-visita-timestamp pull-right">{{service.cadafecha(visita.fecha_in) | date: 'mediumDate'}} - {{service.cadhoramil(visita.hora_in)}}</span></li>
+                    <li *ngIf="visita.estado==='C' || visita.estado==='A'">Ingreso: <span class="direct-visita-timestamp pull-right">{{visita.fechahora_ingreso | date: 'medium'}}</span></li>
+                    <li *ngIf="visita.estado==='C'">Cierre: <span class="direct-visita-timestamp pull-right">{{visita.fechahora_cierre | date: 'medium'}} </span></li>
+                </ul>
+                <div class='box-body'>
+                    <h4><span class="titulocaja">
+                                    Notas </span></h4>
+                    <p>{{visita.notaing}}</p>
+                    <p>{{visita.notas}}</p>
+                </div>
+            </div>
+            <!-- /.widget-user -->
+        </div>
+        <!-- /.col -->
+        <!-- <div class="box box-success">
+            <div class="box-header with-border">
+                <h3 class="box-title">Datos Visita</h3>
+            </div>
+            <div class="box-body">
+                Aqui datos de la visita
+            </div>
+        </div> -->
+
+    </div>
+    <div class="col-md-8">
+        <div class="box box-success">
+            <div class="box-header with-border">
+                <h3 class="box-title">Datos Visita</h3>
+            </div>
+            <div class="box-body">
+                <kendo-splitter-pane>
+                    <kendo-tabstrip>
+                        <kendo-tabstrip-tab [title]="'Actividades'" [selected]="true">
+                            <ng-template kendoTabContent>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div *ngIf="!esconder" class="box box-warning">
+                                            <div class="box-header with-border">
+
+                                                <h3 class="box-title">Actividades Registradas</h3>
+                                                <!-- <div class="box-tools pull-right">
+                                                    <button *ngIf="collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-plus"></i></button>
+                                                    <button *ngIf="!collapse" class="btn btn-box-tool" data-widget="collapse" (click)="conmutacollapse()"><i class="fa fa-minus"></i></button>
+                                                    <button class="btn btn-box-tool" data-widget="remove" (click)="esconderpanel()"><i class="fa fa-times"></i></button>
+                                                </div> -->
+                                            </div>
+                                            <div *ngIf="cargo_actividades" class="box-body">
+                                                <ul class="products-list product-list-in-box">
+                                                    <li class="item" *ngFor="let actividad of actividades">
+                                                        <div class="direct-act-info clearfix">
+                                                            <span class="direct-act-name pull-left"> {{actividad.nom_tipoact}}</span>
+                                                            <span class="direct-act-timestamp pull-right">{{actividad.tipo_act}}</span>
+                                                        </div>
+
+                                                        <div class="text-notas">
+                                                            {{actividad.notas}}
+                                                        </div>
+
+                                                    </li>
+                                                </ul>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </kendo-tabstrip-tab>
+                        <kendo-tabstrip-tab [title]="'Fotos'">
+                            <ng-template kendoTabContent>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Fotos</h3>
+                                        </div>
+                                        <div *ngIf="cargo_fotos" class="box-body">
+                                            <kendo-scrollview [data]="fotos" [width]="widthfotos" [height]="heightfotos" [arrows]="true" [pageable]="true">
+                                                <ng-template let-item="item">
+                                                    <!-- <h2 class="demo-title">{{item.title}}</h2> -->
+                                                    <!-- <img src='{{item.link_foto}}' alt='{{item.title}}' [ngStyle]="{minWidth: width}" draggable="false" /> -->
+                                                    <img class="foto" src='{{item.link_foto}}' [ngStyle]="{minWidth: widthfotos}" draggable="true" />
+                                                </ng-template>
+                                            </kendo-scrollview>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </kendo-tabstrip-tab>
+                        <kendo-tabstrip-tab [title]="'Pedidos'">
+                            <ng-template kendoTabContent>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Pedidos</h3>
+                                        </div>
+                                        <div *ngIf="cargo_pedidos" class="box-body">
+                                            <ul class="products-list product-list-in-box">
+                                                <li class="item" *ngFor="let pedido of pedidos">
+                                                    <div class="direct-act-info clearfix">
+                                                        <a target="_blank" [href]="linkpedido(pedido.cod_dpedid,pedido.num_dpedid,pedido.fecha)">
+                                                            <span class="direct-act-name pull-left"> {{pedido.cod_dpedid+'/'+pedido.num_dpedid}}</span>
+                                                        </a>
+                                                        <span class="direct-act-timestamp pull-right">{{pedido.fecha |  date: 'mediumDate'}}</span>
+                                                    </div>
+                                                    <div class="direct-act-info clearfix">
+                                                        <ul class="products-list product-list-in-box">
+                                                            <div class="box-body">
+                                                                <div class="table-responsive">
+                                                                    <table class="tabla">
+                                                                        <tbody>
+                                                                            <li *ngFor="let pdeta of pedido.detalle; let i = index;">
+                                                                                <thead>
+                                                                                    <tr *ngIf="i===0" class="filatabla">
+                                                                                        <th class="colrefer">Código</th>
+                                                                                        <th class="coldescri">Referencia</th>
+                                                                                        <th class="colcant">Cantidad</th>
+                                                                                        <th class="colvalor">Total</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tr class="filatabla">
+                                                                                    <td class="colrefer">{{pdeta.cod_refven}}</td>
+                                                                                    <td class="coldescri">{{pdeta.descrip}}</td>
+                                                                                    <td class="colcant">{{pdeta.cantidad}}</td>
+                                                                                    <td class="colvalor">{{pdeta.valor_neto | currency}}</td>
+                                                                                </tr>
+                                                                                <!-- /.box-body -->
+                                                                            </li>
+                                                                            <thead>
+                                                                                <tr class="filatabla">
+                                                                                    <th class="colrefer">Total</th>
+                                                                                    <th class="coldescri"></th>
+                                                                                    <th class="colcant"></th>
+                                                                                    <th class="colvalor">{{totalpedido(pedido.detalle) | currency}}</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                            <!-- /.table-responsive -->
+                                                        </ul>
+
+                                                    </div>
+
+                                                </li>
+                                            </ul>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </kendo-tabstrip-tab>
+                        <kendo-tabstrip-tab [title]="'Facturas'">
+                            <ng-template kendoTabContent>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Facturas</h3>
+                                        </div>
+                                        <div *ngIf="cargo_pedidos" class="box-body">
+                                            <ul class="products-list product-list-in-box">
+                                                <li class="item" *ngFor="let factura of facturas">
+                                                    <div class="direct-act-info clearfix">
+                                                        <a target="_blank" [href]="linkfactura(factura.cod_dfactur,factura.num_dfactur,factura.fecha)">
+                                                            <span class="direct-act-name pull-left"> {{factura.cod_dfactur+'/'+factura.num_dfactur}}</span>
+                                                        </a>
+                                                        <span class="direct-act-timestamp pull-right">{{factura.fecha |  date: 'mediumDate'}}</span>
+                                                    </div>
+                                                    <div class="direct-act-info clearfix">
+                                                        <ul class="products-list product-list-in-box">
+                                                            <div class="box-body">
+                                                                <div class="table-responsive">
+                                                                    <table class="tabla">
+                                                                        <tbody>
+                                                                            <li *ngFor="let fdeta of factura.detalle; let i = index;">
+                                                                                <thead>
+                                                                                    <tr *ngIf="i===0" class="filatabla">
+                                                                                        <th class="colrefer">Código</th>
+                                                                                        <th class="coldescri">Referencia</th>
+                                                                                        <th class="colcant">Cantidad</th>
+                                                                                        <th class="colvalor">Total</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tr class="filatabla">
+                                                                                    <td class="colrefer">{{fdeta.cod_refven}}</td>
+                                                                                    <td class="coldescri">{{fdeta.descrip}}</td>
+                                                                                    <td class="colcant">{{fdeta.cantidad}}</td>
+                                                                                    <td class="colvalor">{{fdeta.valor_neto | currency}}</td>
+                                                                                </tr>
+                                                                                <!-- /.box-body -->
+                                                                            </li>
+                                                                            <thead>
+                                                                                <tr class="filatabla">
+                                                                                    <th class="colrefer">Total</th>
+                                                                                    <th class="coldescri"></th>
+                                                                                    <th class="colcant"></th>
+                                                                                    <th class="colvalor">{{totalfactura(factura.detalle) | currency}}</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                            <!-- /.table-responsive -->
+                                                        </ul>
+
+                                                    </div>
+
+                                                </li>
+                                            </ul>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </kendo-tabstrip-tab>
+                        <kendo-tabstrip-tab [title]="'Recibos'">
+                            <ng-template kendoTabContent>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Recibos</h3>
+                                        </div>
+                                        <div *ngIf="cargo_pedidos" class="box-body">
+                                            <ul class="products-list product-list-in-box">
+                                                <li class="item" *ngFor="let recibo of recibos">
+                                                    <div class="direct-act-info clearfix">
+                                                        <a target="_blank" [href]="linkrecibo(recibo.cod_docume,recibo.num_docume,recibo.fecha)">
+                                                            <span class="direct-act-name pull-left"> {{recibo.cod_docume+'/'+recibo.num_docume}}</span>
+                                                        </a>
+                                                        <span class="direct-act-timestamp pull-right">{{recibo.fecha |  date: 'mediumDate'}}</span>
+                                                    </div>
+                                                    <div class="direct-act-info clearfix">
+                                                        <ul class="products-list product-list-in-box">
+                                                            <div class="box-body">
+                                                                <div class="table-responsive">
+                                                                    <table class="tabla">
+                                                                        <tbody>
+                                                                            <li *ngFor="let rdeta of recibo.detalle; let i = index;">
+                                                                                <thead>
+                                                                                    <tr *ngIf="i===0" class="filatabla">
+                                                                                        <th class="colrefer">Factura</th>
+                                                                                        <th class="coldescri">Descrip</th>
+                                                                                        <th class="colcant">Valor</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tr class="filatabla">
+                                                                                    <td class="colrefer">{{rdeta.doc_afecta}}</td>
+                                                                                    <td class="coldescri">{{rdeta.descripcio}}</td>
+                                                                                    <td class="colvalor">{{rdeta.valor | currency}}</td>
+                                                                                </tr>
+                                                                                <!-- /.box-body -->
+                                                                            </li>
+                                                                            <!-- <thead>
+                                                                                <tr class="filatabla">
+                                                                                    <th class="colrefer">Total</th>
+                                                                                    <th class="coldescri"></th>
+                                                                                    <th class="colcant"></th>
+                                                                                    <th class="colvalor">{{totalrecibo(recibo.detalle) | currency}}</th>
+                                                                                </tr>
+                                                                            </thead> -->
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                            <!-- /.table-responsive -->
+                                                        </ul>
+
+                                                    </div>
+
+                                                </li>
+                                            </ul>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </kendo-tabstrip-tab>
+                    </kendo-tabstrip>
+                </kendo-splitter-pane>
+            </div>
+        </div>
+    </div>
+</div>
