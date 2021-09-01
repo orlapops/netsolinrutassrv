@@ -141,6 +141,9 @@ export class MonitorVisitaComponent implements OnInit {
 
   ngOnInit() {
     // console.log("en ngOnInit editregCliepotecial");
+    if(!this.service.cargaDhome){
+      this.service.cargasidebarmenu = false;
+    }
     this.cargando = true;
     this.resultados = false;
     this.activatedRouter.params.subscribe(parametros => {

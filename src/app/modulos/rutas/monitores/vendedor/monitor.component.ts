@@ -205,7 +205,9 @@ export class MonitorVendedorComponent implements OnInit {
 
   ngOnInit() {
     console.log("en ngOnInit monitor vendedor 1");
-
+    if(!this.service.cargaDhome){
+      this.service.cargasidebarmenu = false;
+    }
     this.activatedRouter.params.subscribe(parametros => {
       // this.varParam = parametros['varParam'];
       // this.id = parametros['id'];

@@ -18,7 +18,9 @@ export class NetsolinService {
 	public id_periodo: string;
 	public id_ruta: number = 0;
 
-
+	//Variables carga menu
+	public cargaDhome = false;
+	public cargasidebarmenu = true;
 	constructor(private http: HttpClient) {
 	}
 

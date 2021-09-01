@@ -5,7 +5,7 @@
 <div *ngIf="!cargando && !errorcargando">
     <!-- <div *ngIf="!cargando"> -->
     <app-appheader></app-appheader>
-    <app-appmenurutas></app-appmenurutas>
+    <app-appmenurutas *ngIf="service.cargasidebarmenu"></app-appmenurutas>
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
         <!-- Content Header (Page header) -->

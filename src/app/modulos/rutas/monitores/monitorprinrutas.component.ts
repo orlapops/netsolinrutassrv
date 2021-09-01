@@ -346,6 +346,7 @@ export class MonitorPrinRutasComponent implements OnInit {
   }
   handleRedirigirChange(value) {
     console.log('handleRedirigirChange',value);
+    this.service.cargaDhome = true;
     this.router.navigate(['/monitorvendedor/VPARVENDEDORES/' + value]);
   }
   handleEnviarChange(value) {
