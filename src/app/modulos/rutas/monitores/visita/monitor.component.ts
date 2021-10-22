@@ -87,6 +87,8 @@ export class MonitorVisitaComponent implements OnInit {
   cargo_actividades = false;
   fotos: Array<any> = [];
   cargo_fotos = false;
+  videos: Array<any> = [];
+  cargo_videos = false;
   public widthfotos = '100%';
   public heightfotos = '500px';
 
@@ -189,7 +191,13 @@ export class MonitorVisitaComponent implements OnInit {
           this.fotos = datosfot;
           this.cargo_fotos = true;
           console.log('fotos cargada ', this.fotos);
-        });        
+        });
+        //cargar  videos visita
+        this.getVideosActual().subscribe((datosvid: any) => {
+          this.videos = datosvid;
+          this.cargo_videos = true;
+          console.log('videos cargados ', this.videos);
+        });
         //cargar  direccion visita
         this.getDireccionActual(data.id_dir).subscribe((datosdir: any) => {
           this.dir_visita = datosdir;
@@ -238,6 +246,13 @@ export class MonitorVisitaComponent implements OnInit {
     .collection(`/personal/${this.pcod_vended}/rutas/${this.pid_ruta}/periodos/${this.pid_periodo}/visitas/${this.pid_visita}/fotos`)
     .valueChanges();
   }
+
+    //Trae videos visita
+    public getVideosActual() {
+      return this.db
+      .collection(`/personal/${this.pcod_vended}/rutas/${this.pid_ruta}/periodos/${this.pid_periodo}/visitas/${this.pid_visita}/videos`)
+      .valueChanges();
+    }
 
   //Trae pedidos visita actual firebase
   public getPedidosVisita(id: number) {

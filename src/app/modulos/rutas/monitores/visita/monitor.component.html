@@ -139,12 +139,35 @@
                                         <div class="box-header with-border">
                                             <h3 class="box-title">Fotos</h3>
                                         </div>
-                                        <div *ngIf="cargo_fotos" class="box-body">
+                                        <div *ngIf="cargo_fotos && fotos.length>0" class="box-body">
                                             <kendo-scrollview [data]="fotos" [width]="widthfotos" [height]="heightfotos" [arrows]="true" [pageable]="true">
                                                 <ng-template let-item="item">
                                                     <!-- <h2 class="demo-title">{{item.title}}</h2> -->
                                                     <!-- <img src='{{item.link_foto}}' alt='{{item.title}}' [ngStyle]="{minWidth: width}" draggable="false" /> -->
                                                     <img class="foto" src='{{item.link_foto}}' [ngStyle]="{minWidth: widthfotos}" draggable="true" />
+                                                </ng-template>
+                                            </kendo-scrollview>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-template>
+                        </kendo-tabstrip-tab>
+                        <kendo-tabstrip-tab [title]="'Videos'">
+                            <ng-template kendoTabContent>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="box-header with-border">
+                                            <h3 class="box-title">Videos</h3>
+                                        </div>
+                                        <div *ngIf="cargo_videos && videos.length>0" class="box-body">
+                                            <kendo-scrollview [data]="videos" [width]="widthfotos" height="700px" [arrows]="true" [pageable]="true">
+                                                <ng-template let-item="item">
+                                                    <!-- <h2 class="demo-title">{{item.title}}</h2> -->
+                                                    <!-- <img src='{{item.link_foto}}' alt='{{item.title}}' [ngStyle]="{minWidth: width}" draggable="false" /> -->
+                                                    <div style="display: flex;justify-content: center;">
+                                                        <video controls [src]="item.link_video"></video>  
+                                                    </div>
                                                 </ng-template>
                                             </kendo-scrollview>
 
