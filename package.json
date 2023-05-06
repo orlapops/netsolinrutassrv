@@ -41,7 +41,7 @@
         "@progress/kendo-theme-bootstrap": "^2.13.7",
         "@progress/kendo-theme-default": "^2.54.0",
         "angularfire2": "^5.0.0-rc.12",
-        "bootstrap": "^4.1.2",
+        "bootstrap": "^4.3.1",
         "core-js": "^2.5.4",
         "firebase": "^5.5.3",
         "hammerjs": "^2.0.0",
